@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import com.lrcortizo.springframework.boot.configuration.properties.TestClassMapperProperties;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,29 +23,10 @@ import java.util.Optional;
 @Slf4j
 public class TestClassMapper {
 
-    public enum FileExtension {
-        YAML, TXT, JSON;
-
-        @Override
-        public String toString() {
-            return "." + this.name().toLowerCase();
-        }
-
-        public String fileTestSuffixExt(final String joiner) {
-            return joiner + TEST_NAME + this;
-        }
-
-        public String fileExpectedSuffixExt(final String joiner) {
-            return joiner + EXPECTED_NAME + this;
-        }
-    }
-
-    private final static String TEST_NAME = "test";
-    private final static String EXPECTED_NAME = "expected";
-    private final static String DEFAULT_TEST_RESOURCES = "src\\test\\resources\\mocks";
-    private final static Feature DEFAULT_DISABLED_FEATURE = Feature.WRITE_DOC_START_MARKER;
-    private final static SerializationFeature DEFAULT_DATE_SER = SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-    private final static FileExtension DEFAULT_FILE_EXTENSION = FileExtension.YAML;
+    private static final String DEFAULT_TEST_RESOURCES = "src\\test\\resources\\mocks";
+    private static final Feature DEFAULT_DISABLED_FEATURE = Feature.WRITE_DOC_START_MARKER;
+    private static final SerializationFeature DEFAULT_DATE_SER = SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+    private static final FileExtension DEFAULT_FILE_EXTENSION = FileExtension.YAML;
 
     @NonNull
     private final String label;
@@ -53,7 +36,7 @@ public class TestClassMapper {
     private FileExtension fileExtension;
 
     public TestClassMapper() {
-        this("");
+        this(StringUtils.EMPTY);
     }
 
     TestClassMapper(@NonNull final String label) {
@@ -112,7 +95,7 @@ public class TestClassMapper {
     private <T> File loadFile(final Class<T> tClass, final Boolean isCollection, final Boolean isTest) {
         Objects.requireNonNull(tClass);
         final String fileName = this.fileNameBuild(tClass.getSimpleName(), isCollection, isTest);
-        log.info("Parse test class {} [{}] from resource file > {}", isCollection ? "collection" : "object",
+        log.info("Parse test class {} [{}] from resource file > {}", Boolean.TRUE.equals(isCollection) ? "collection" : "object",
                 tClass.getSimpleName(), fileName);
         return new File(Paths.get(this.testResourcePath.toString(), fileName).toFile().getAbsolutePath());
     }
@@ -129,19 +112,16 @@ public class TestClassMapper {
 
     private String fileNameBuild(final String className, final Boolean isCollection, final Boolean isTest) {
         final String jnr = this.wordsJoiner;
-        return className + (isCollection ? "s" : "")
-                + ((this.label == null || this.label.trim().isEmpty()) ? "" : jnr + this.label.trim())
-                + (isTest ? this.fileExtension.fileTestSuffixExt(jnr) : this.fileExtension.fileExpectedSuffixExt(jnr));
+        return className + (Boolean.TRUE.equals(isCollection) ? "s" : StringUtils.EMPTY)
+                + ((this.label == null || this.label.trim().isEmpty()) ? StringUtils.EMPTY : jnr + this.label.trim())
+                + (Boolean.TRUE.equals(isTest) ? this.fileExtension.fileTestSuffixExt(jnr) : this.fileExtension.fileExpectedSuffixExt(jnr));
     }
 
     private ObjectMapper buildObjectMapper() {
-        switch (this.fileExtension) {
-            case TXT:
-            case JSON:
-                return buildJsonObjectMapper();
-            default:
-                return buildYamlObjectMapper();
-        }
+        return switch (this.fileExtension) {
+            case TXT, JSON -> buildJsonObjectMapper();
+            default -> buildYamlObjectMapper();
+        };
     }
 
     private static ObjectMapper buildYamlObjectMapper() {

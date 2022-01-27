@@ -7,5 +7,4 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({MockCollection.class, TestContext.class})
 public class ExtendedTestAutoConfiguration {
-
 }
