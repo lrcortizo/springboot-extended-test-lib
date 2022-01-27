@@ -2,6 +2,7 @@ package com.lrcortizo.springframework.boot.mock;
 
 import com.lrcortizo.springframework.boot.configuration.properties.TestClassMapperProperties;
 import com.lrcortizo.springframework.boot.mapper.MockMapper;
+import com.lrcortizo.springframework.boot.mapper.objectmapper.ObjectMapperBuilderResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +14,9 @@ import static org.assertj.core.api.Fail.fail;
 @Component
 public class MockService extends MockMapper {
 
-    public MockService(final TestClassMapperProperties properties) {
-        super(properties);
+    public MockService(final TestClassMapperProperties testClassMapperProperties,
+                       final ObjectMapperBuilderResolver objectMapperBuilderResolver) {
+        super(testClassMapperProperties, objectMapperBuilderResolver);
     }
 
     public <T> T mockClassFromJSON(final Class<T> type) {
