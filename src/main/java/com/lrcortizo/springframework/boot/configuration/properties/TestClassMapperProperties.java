@@ -13,7 +13,7 @@ public class TestClassMapperProperties {
 
     String resourcesPath;
 
-    String mapperExtension;
+    String fileExtension;
 
     String wordsJoiner;
 

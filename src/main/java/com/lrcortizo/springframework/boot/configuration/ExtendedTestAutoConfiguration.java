@@ -1,10 +1,10 @@
 package com.lrcortizo.springframework.boot.configuration;
 
-import com.lrcortizo.springframework.boot.mock.MockCollection;
+import com.lrcortizo.springframework.boot.mock.MockService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({MockCollection.class, TestContext.class})
+@Import({MockService.class, TestContext.class})
 public class ExtendedTestAutoConfiguration {
 }

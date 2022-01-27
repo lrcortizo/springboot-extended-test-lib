@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.lrcortizo.springframework.boot.configuration.properties.TestClassMapperProperties;
+import com.lrcortizo.springframework.boot.model.catalog.FileExtension;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -23,86 +24,66 @@ import java.util.Optional;
 @Slf4j
 public class TestClassMapper {
 
-    private static final String DEFAULT_TEST_RESOURCES = "src\\test\\resources\\mocks";
-    private static final Feature DEFAULT_DISABLED_FEATURE = Feature.WRITE_DOC_START_MARKER;
-    private static final SerializationFeature DEFAULT_DATE_SER = SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-    private static final FileExtension DEFAULT_FILE_EXTENSION = FileExtension.YAML;
+    private static final String DEFAULT_RESOURCES_PATH = "src\\test\\resources\\mocks";
+    private static final FileExtension DEFAULT_FILE_EXTENSION = FileExtension.JSON;
+    private static final String DEFAULT_WORDS_JOINER = "_";
 
-    @NonNull
-    private final String label;
-    private final String wordsJoiner;
-    private final Path testResourcePath;
-    private ObjectMapper mapper;
+    private final Path resourcesPath;
     private FileExtension fileExtension;
+    private final String wordsJoiner;
+    private ObjectMapper objectMapper;
 
-    public TestClassMapper() {
-        this(StringUtils.EMPTY);
-    }
-
-    TestClassMapper(@NonNull final String label) {
-        this(label, new TestClassMapperProperties());
-    }
-
-    TestClassMapper(@NonNull final String label, @NonNull final TestClassMapperProperties properties) {
-        super();
-        this.label = label;
-        this.fileExtension = FileExtension.valueOf(Optional.ofNullable(properties.getMapperExtension())
+    TestClassMapper(@NonNull final TestClassMapperProperties properties) {
+        this.resourcesPath = Paths.get(Optional.ofNullable(properties.getResourcesPath())
+                .orElse(DEFAULT_RESOURCES_PATH));
+        this.fileExtension = FileExtension.valueOf(Optional.ofNullable(properties.getFileExtension())
                 .orElse(DEFAULT_FILE_EXTENSION.name()).toUpperCase());
-        this.testResourcePath = Paths.get(Optional.ofNullable(properties.getResourcesPath())
-                .orElse(DEFAULT_TEST_RESOURCES));
-        this.wordsJoiner = Optional.ofNullable(properties.getWordsJoiner()).orElse("_");
-        this.mapper = this.buildObjectMapper();
+        this.wordsJoiner = Optional.ofNullable(properties.getWordsJoiner()).orElse(DEFAULT_WORDS_JOINER);
+        this.objectMapper = this.buildObjectMapper();
     }
 
-    public <T> Collection<T> loadTestClassCollection(final Class<T> type) throws IOException {
-        return this.mapper.readValue(this.loadFile(type, Boolean.TRUE, Boolean.TRUE),
-                this.mapper.getTypeFactory().constructCollectionType(Collection.class, type));
+    public <T> T loadTestClass(final Class<T> type, final String label) throws IOException {
+        return this.objectMapper.readValue(this.loadFile(type, label, Boolean.FALSE), type);
     }
 
-    public <T> T loadTestClass(final Class<T> type) throws IOException {
-        return this.mapper.readValue(this.loadFile(type, Boolean.FALSE, Boolean.TRUE), type);
-    }
-
-    public <T> Collection<T> loadTestExpectedClassCollection(final Class<T> type) throws IOException {
-        return this.mapper.readValue(this.loadFile(type, Boolean.TRUE, Boolean.FALSE),
-                this.mapper.getTypeFactory().constructCollectionType(Collection.class, type));
-    }
-
-    public <T> T loadTestExpectedClass(final Class<T> type) throws IOException {
-        return this.mapper.readValue(this.loadFile(type, Boolean.FALSE, Boolean.FALSE), type);
-    }
-
-    public <T> T loadTestExpectedClass(final Class<T> type, final FileExtension fileExtension) throws IOException {
+    public <T> T loadTestClass(final Class<T> type, final String label, final FileExtension fileExtension)
+            throws IOException {
         this.fileExtension = fileExtension;
-        this.mapper = this.buildObjectMapper();
-        return this.mapper.readValue(this.loadFile(type, Boolean.FALSE, Boolean.FALSE), type);
+        this.objectMapper = this.buildObjectMapper();
+        return this.objectMapper.readValue(this.loadFile(type, label, Boolean.FALSE), type);
     }
 
-    public <T> Collection<T> loadExpectedClassCollection(final Class<T> type, final FileExtension fileExtension) throws IOException {
+    public <T> Collection<T> loadTestClassCollection(final Class<T> type, final String label) throws IOException {
+        return this.objectMapper.readValue(this.loadFile(type, label, Boolean.TRUE),
+                this.objectMapper.getTypeFactory().constructCollectionType(Collection.class, type));
+    }
+
+    public <T> Collection<T> loadTestClassCollection(final Class<T> type, final String label,
+                                                     final FileExtension fileExtension) throws IOException {
         this.fileExtension = fileExtension;
-        this.mapper = this.buildObjectMapper();
-        return this.mapper.readValue(this.loadFile(type, Boolean.TRUE, Boolean.FALSE),
-                this.mapper.getTypeFactory().constructCollectionType(Collection.class, type));
+        this.objectMapper = this.buildObjectMapper();
+        return this.objectMapper.readValue(this.loadFile(type, label, Boolean.TRUE),
+                this.objectMapper.getTypeFactory().constructCollectionType(Collection.class, type));
     }
 
-    public <T> Boolean saveFileObject(final Object object, final Class<T> type, final Boolean isTest) {
+    public <T> Boolean saveFileObject(final Object object, final String label, final Class<T> type) {
         Objects.requireNonNull(object);
-        final File file = this.loadFile(type, (object instanceof Collection<?>), isTest);
+        final File file = this.loadFile(type, label, (object instanceof Collection<?>));
         log.info("Write test class resource file [{}] from collection > {}", file.getName(), type.getSimpleName());
         return this.saveFileObject(object, file);
     }
 
-    private <T> File loadFile(final Class<T> tClass, final Boolean isCollection, final Boolean isTest) {
+    private <T> File loadFile(final Class<T> tClass, final String label, final Boolean isCollection) {
         Objects.requireNonNull(tClass);
-        final String fileName = this.fileNameBuild(tClass.getSimpleName(), isCollection, isTest);
-        log.info("Parse test class {} [{}] from resource file > {}", Boolean.TRUE.equals(isCollection) ? "collection" : "object",
-                tClass.getSimpleName(), fileName);
-        return new File(Paths.get(this.testResourcePath.toString(), fileName).toFile().getAbsolutePath());
+        final String fileName = this.fileNameBuild(tClass.getSimpleName(), label, isCollection);
+        log.info("Parse test class {} [{}] from resource file > {}",
+                Boolean.TRUE.equals(isCollection) ? "collection" : "object", tClass.getSimpleName(), fileName);
+        return new File(Paths.get(this.resourcesPath.toString(), fileName).toFile().getAbsolutePath());
     }
 
     private Boolean saveFileObject(final Object object, final File file) {
         try {
-            this.mapper.writeValue(file, object);
+            this.objectMapper.writeValue(file, object);
             return Boolean.TRUE;
         } catch (final Exception ex) {
             log.error("Unable to write the test class resource file [{}]", ex.getMessage());
@@ -110,28 +91,25 @@ public class TestClassMapper {
         return Boolean.FALSE;
     }
 
-    private String fileNameBuild(final String className, final Boolean isCollection, final Boolean isTest) {
-        final String jnr = this.wordsJoiner;
+    private String fileNameBuild(final String className, final String label, final Boolean isCollection) {
         return className + (Boolean.TRUE.equals(isCollection) ? "s" : StringUtils.EMPTY)
-                + ((this.label == null || this.label.trim().isEmpty()) ? StringUtils.EMPTY : jnr + this.label.trim())
-                + (Boolean.TRUE.equals(isTest) ? this.fileExtension.fileTestSuffixExt(jnr) : this.fileExtension.fileExpectedSuffixExt(jnr));
+                + ((label == null || label.trim().isEmpty()) ? StringUtils.EMPTY : this.wordsJoiner + label.trim());
     }
 
     private ObjectMapper buildObjectMapper() {
-        return switch (this.fileExtension) {
-            case TXT, JSON -> buildJsonObjectMapper();
-            default -> buildYamlObjectMapper();
-        };
-    }
-
-    private static ObjectMapper buildYamlObjectMapper() {
-        final YAMLFactory yamlFactory = new YAMLFactory().disable(DEFAULT_DISABLED_FEATURE);
-        return new ObjectMapper(yamlFactory).findAndRegisterModules().disable(DEFAULT_DATE_SER);
+        return this.fileExtension == FileExtension.YAML ? buildYamlObjectMapper() : buildJsonObjectMapper();
     }
 
     private static ObjectMapper buildJsonObjectMapper() {
         final JsonFactory jsonFactory = new JsonFactory();
-        return new ObjectMapper(jsonFactory).findAndRegisterModules().disable(DEFAULT_DATE_SER);
+        return new ObjectMapper(jsonFactory).findAndRegisterModules()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
+    private static ObjectMapper buildYamlObjectMapper() {
+        final YAMLFactory yamlFactory = new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER);
+        return new ObjectMapper(yamlFactory).findAndRegisterModules()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 }
 

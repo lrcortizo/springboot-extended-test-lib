@@ -1,4 +1,4 @@
-package com.lrcortizo.springframework.boot.interfaces;
+package com.lrcortizo.springframework.boot.annotations;
 
 import org.junit.jupiter.api.Tag;
 
@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Tag("exception_test")
-public @interface ExceptionTest {
+@Tag("service_test")
+public @interface ServiceTest {
 }
