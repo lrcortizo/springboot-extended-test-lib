@@ -56,7 +56,7 @@ public class TestClassMapper {
     private <T> File loadFile(final Class<T> tClass, final String label, final Boolean isCollection) {
         Objects.requireNonNull(tClass);
         final String fileName = this.fileNameBuild(tClass.getSimpleName(), label, isCollection);
-        log.info("Parse test class {} [{}] from resource file > {}",
+        log.info("Load test class {} [{}] from resource file > {}",
                 Boolean.TRUE.equals(isCollection) ? "collection" : "object", tClass.getSimpleName(), fileName);
         return new File(Paths.get(this.resourcesPath.toString(), fileName).toFile().getAbsolutePath());
     }
