@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @NonFinal
 public class TestClassMapperProperties {
 
-    String resourcesPath;
+    String mocksPath;
 
     String wordsJoiner;
 
