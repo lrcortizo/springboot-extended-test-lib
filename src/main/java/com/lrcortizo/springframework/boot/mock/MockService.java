@@ -19,6 +19,11 @@ public class MockService extends MockMapper {
         super(testClassMapperProperties, objectMapperBuilderResolver);
     }
 
+    private static void failOnException(final String className, final String exception) {
+        final String msg = String.format("Mocked class %s.class loading error -> %s", className, exception);
+        fail(msg);
+    }
+
     public <T> T mockClassFromJSON(final Class<T> type) {
         return this.mockClassFromJSON(type, StringUtils.EMPTY);
     }
@@ -69,10 +74,5 @@ public class MockService extends MockMapper {
             failOnException(type.getSimpleName(), e.getMessage());
         }
         return List.of();
-    }
-
-    private static void failOnException(final String className, final String exception) {
-        final String msg = String.format("Mocked class %s.class loading error -> %s", className, exception);
-        fail(msg);
     }
 }

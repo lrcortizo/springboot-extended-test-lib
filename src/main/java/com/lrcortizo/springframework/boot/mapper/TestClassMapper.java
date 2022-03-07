@@ -23,13 +23,13 @@ public class TestClassMapper {
     private static final String DEFAULT_WORDS_JOINER = "_";
     private static final String DEFAULT_COLLECTIONS_LABEL = "s";
 
-    private final Path resourcesPath;
+    private final Path mocksPath;
     private final String wordsJoiner;
     private final String collectionsLabel;
     private final ObjectMapper objectMapper;
 
     TestClassMapper(@NonNull final TestClassMapperProperties properties, @NonNull final ObjectMapper objectMapper) {
-        this.resourcesPath = Paths.get(Optional.ofNullable(properties.getResourcesPath())
+        this.mocksPath = Paths.get(Optional.ofNullable(properties.getMocksPath())
                 .orElse(DEFAULT_RESOURCES_PATH));
         this.wordsJoiner = Optional.ofNullable(properties.getWordsJoiner()).orElse(DEFAULT_WORDS_JOINER);
         this.collectionsLabel = Optional.ofNullable(properties.getCollectionsLabel()).orElse(DEFAULT_COLLECTIONS_LABEL);
@@ -58,7 +58,7 @@ public class TestClassMapper {
         final String fileName = this.fileNameBuild(tClass.getSimpleName(), label, isCollection);
         log.info("Load test class {} [{}] from resource file > {}",
                 Boolean.TRUE.equals(isCollection) ? "collection" : "object", tClass.getSimpleName(), fileName);
-        return new File(Paths.get(this.resourcesPath.toString(), fileName).toFile().getAbsolutePath());
+        return new File(Paths.get(this.mocksPath.toString(), fileName).toFile().getAbsolutePath());
     }
 
     private Boolean saveFileObject(final Object object, final File file) {
