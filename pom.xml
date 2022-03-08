@@ -11,10 +11,10 @@
 
     <groupId>com.lrcortizo.springframework.boot</groupId>
     <artifactId>springboot-extended-test</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.1</version>
 
     <name>springboot-extended-test-lib</name>
-    <description>Spring Boot extended test lib</description>
+    <description>Spring Boot extended test library</description>
 
     <scm>
         <developerConnection>scm:git:https://github.com/lrcortizo/springboot-extended-test-lib
