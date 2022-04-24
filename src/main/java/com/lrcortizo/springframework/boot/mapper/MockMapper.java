@@ -47,13 +47,13 @@ public class MockMapper {
                 .loadTestClassCollection(type, label);
     }
 
-    public <T> Boolean saveJsonFileObject(final Object object, final Class<T> type, final String label) {
-        return new TestClassMapper(this.testClassMapperProperties, this.buildObjectMapper(FileExtension.JSON))
+    public <T> void saveJsonFileObject(final Object object, final Class<T> type, final String label) {
+        new TestClassMapper(this.testClassMapperProperties, this.buildObjectMapper(FileExtension.JSON))
                 .saveFileObject(object, type, label);
     }
 
-    public <T> Boolean saveYamlFileObject(final Object object, final Class<T> type, final String label) {
-        return new TestClassMapper(this.testClassMapperProperties, this.buildObjectMapper(FileExtension.YAML))
+    public <T> void saveYamlFileObject(final Object object, final Class<T> type, final String label) {
+        new TestClassMapper(this.testClassMapperProperties, this.buildObjectMapper(FileExtension.YAML))
                 .saveFileObject(object, type, label);
     }
 

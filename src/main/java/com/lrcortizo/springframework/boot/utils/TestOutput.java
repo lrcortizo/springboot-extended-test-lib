@@ -1,4 +1,4 @@
-package com.lrcortizo.springframework.boot.ouput;
+package com.lrcortizo.springframework.boot.utils;
 
 import lombok.experimental.UtilityClass;
 
