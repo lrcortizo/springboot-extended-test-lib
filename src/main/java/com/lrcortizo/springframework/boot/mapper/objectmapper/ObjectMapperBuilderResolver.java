@@ -12,7 +12,7 @@ public class ObjectMapperBuilderResolver {
 
     private final Map<String, ObjectMapperBuilderService> objectMapperBuilderServices;
 
-    ObjectMapperBuilderResolver(final List<ObjectMapperBuilderService> objectMapperBuilders) {
+    public ObjectMapperBuilderResolver(final List<ObjectMapperBuilderService> objectMapperBuilders) {
         this.objectMapperBuilderServices = objectMapperBuilders.stream()
                 .collect(Collectors.toUnmodifiableMap(
                         service -> ClassUtils.getUserClass(service.getClass()).getSimpleName(),

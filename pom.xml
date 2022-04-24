@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.4</version>
+        <version>2.6.7</version>
         <relativePath/>
     </parent>
 
     <groupId>com.lrcortizo.springframework.boot</groupId>
     <artifactId>springboot-extended-test</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
 
     <name>springboot-extended-test-lib</name>
     <description>Spring Boot extended test library</description>

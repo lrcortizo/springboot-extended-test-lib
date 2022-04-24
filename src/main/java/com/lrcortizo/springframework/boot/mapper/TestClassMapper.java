@@ -46,33 +46,31 @@ public class TestClassMapper {
                 .constructCollectionType(Collection.class, type));
     }
 
-    public <T> Boolean saveFileObject(final Object object, final Class<T> type, final String label) {
+    public <T> void saveFileObject(final Object object, final Class<T> type, final String label) {
         Objects.requireNonNull(object);
         final File file = this.loadFile(type, label, (object instanceof Collection<?>));
         log.info("Write test class resource file [{}] from collection > {}", file.getName(), type.getSimpleName());
-        return this.saveFileObject(object, file);
+        this.saveFileObject(object, file);
     }
 
-    private <T> File loadFile(final Class<T> tClass, final String label, final Boolean isCollection) {
+    private <T> File loadFile(final Class<T> tClass, final String label, final boolean isCollection) {
         Objects.requireNonNull(tClass);
         final String fileName = this.fileNameBuild(tClass.getSimpleName(), label, isCollection);
         log.info("Load test class {} [{}] from resource file > {}",
-                Boolean.TRUE.equals(isCollection) ? "collection" : "object", tClass.getSimpleName(), fileName);
+                isCollection ? "collection" : "object", tClass.getSimpleName(), fileName);
         return new File(Paths.get(this.mocksPath.toString(), fileName).toFile().getAbsolutePath());
     }
 
-    private Boolean saveFileObject(final Object object, final File file) {
+    private void saveFileObject(final Object object, final File file) {
         try {
             this.objectMapper.writeValue(file, object);
-            return Boolean.TRUE;
-        } catch (final Exception ex) {
-            log.error("Unable to write the test class resource file [{}]", ex.getMessage());
+        } catch (final IOException ex) {
+            log.error("Unable to write the test class resource file [{}]", ex.getMessage(), ex);
         }
-        return Boolean.FALSE;
     }
 
-    private String fileNameBuild(final String className, final String label, final Boolean isCollection) {
-        return className + (Boolean.TRUE.equals(isCollection) ? this.collectionsLabel : StringUtils.EMPTY)
+    private String fileNameBuild(final String className, final String label, final boolean isCollection) {
+        return className + (isCollection ? this.collectionsLabel : StringUtils.EMPTY)
                 + (StringUtils.isEmpty(label.trim()) ? StringUtils.EMPTY : this.wordsJoiner + label.trim());
     }
 }
