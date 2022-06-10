@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @ConstructorBinding
 @Data
 @NonFinal
-public class TestClassMapperProperties {
+public class ClassMapperProperties {
 
     String mocksPath;
 

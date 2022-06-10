@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: ttoo-common-test
+  cloud:
+    config:
+      enabled: false
+    vault:
+      enabled: false
+w2m:
+  skynet:
+    config:
+      enabled: false

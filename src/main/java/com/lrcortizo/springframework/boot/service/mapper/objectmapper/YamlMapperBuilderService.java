@@ -1,4 +1,4 @@
-package com.lrcortizo.springframework.boot.mapper.objectmapper;
+package com.lrcortizo.springframework.boot.service.mapper.objectmapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

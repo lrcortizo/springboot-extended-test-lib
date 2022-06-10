@@ -1,4 +1,4 @@
-package com.lrcortizo.springframework.boot.model.catalog;
+package com.lrcortizo.springframework.boot.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

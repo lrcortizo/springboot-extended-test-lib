@@ -1,0 +1,10 @@
+w2m:
+  test:
+    # resourcesPath e.g. "src/test/resources"
+    resourcesPath: "src/test/resources/mocks"
+    # mapperExtension values: yaml, txt, properties
+    mapperExtension: "yaml"
+    # wordsJoiner is the symbol used as word tokenizer e.g "classType_test.yaml"
+    wordsJoiner: "_"
+    # collectionsLabel is an added suffix to any Collection name e.g "classType(s)_test.yaml"
+    collectionsLabel: "s"

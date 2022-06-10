@@ -1,6 +1,6 @@
 package com.lrcortizo.springframework.boot.configuration;
 
-import com.lrcortizo.springframework.boot.mock.MockService;
+import com.lrcortizo.springframework.boot.service.MockService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 

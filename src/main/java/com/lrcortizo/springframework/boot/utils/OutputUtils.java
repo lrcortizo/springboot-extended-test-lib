@@ -1,20 +1,20 @@
-package com.lrcortizo.springframework.boot.ouput;
+package com.lrcortizo.springframework.boot.utils;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class TestOutput {
+public class OutputUtils {
 
     public String msgNull(final String name) {
-        return "Expected " + name + " null value.";
+        return "Expected " + name + " null value";
     }
 
     public String msgUnMatch(final String name) {
-        return name + " unmatched.";
+        return name + " unmatched";
     }
 
     public String msgEnum(final String name) {
-        return "Invalid " + name + " Enumeration.";
+        return "Invalid " + name + " Enumeration";
     }
 
     public String msgEmptyCollection(final String name) {

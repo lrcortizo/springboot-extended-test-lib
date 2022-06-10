@@ -1,4 +1,4 @@
-package com.lrcortizo.springframework.boot.mapper.objectmapper;
+package com.lrcortizo.springframework.boot.service.mapper.objectmapper;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
